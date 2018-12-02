@@ -2,6 +2,7 @@ module PrsAlternative where
 
 
 import Control.Applicative
+import Data.Char
 
 
 newtype Prs a = Prs { runPrs :: String -> Maybe (a, String) }
@@ -30,5 +31,28 @@ instance Alternative Prs where
   (Prs p) <|> (Prs q) = Prs $ (<|>) <$> p <*> q
 
 
+satisfy :: (Char -> Bool) -> Prs Char
+satisfy pr = Prs fun where
+  fun [] = Nothing
+  fun (x:xs) | pr x = Just (x, xs)
+             | otherwise = Nothing
+
+
+char :: Char -> Prs Char
+char ch = satisfy (== ch)
+
+
+digit :: Prs Char
+digit = satisfy isDigit
+
+
 many1 :: Prs a -> Prs [a]
 many1 p = (:) <$> p <*> many p
+
+
+nat :: Prs Int
+nat = read <$> many1 digit
+
+
+mult :: Prs Int
+mult = (*) <$> nat <* char '*' <*> nat
