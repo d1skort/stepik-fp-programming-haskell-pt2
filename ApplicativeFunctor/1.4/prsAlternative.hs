@@ -28,3 +28,7 @@ instance Alternative Prs where
 
   -- (<|>) :: f a -> f a -> f a
   (Prs p) <|> (Prs q) = Prs $ (<|>) <$> p <*> q
+
+
+many1 :: Prs a -> Prs [a]
+many1 p = (:) <$> p <*> many p
