@@ -7,8 +7,12 @@ newtype PostOrder a = PostO (Tree a) deriving (Eq, Show)
 newtype LevelOder a = LevelO (Tree a) deriving (Eq, Show)
 
 
-tree = Branch (Branch Nil 1 (Branch Nil 2 Nil)) 3 (Branch Nil 4 Nil)
-
+tree = Branch (Branch (Branch Nil 0 Nil) 2 (Branch Nil 3 Nil)) 6 (Branch (Branch Nil 7 Nil) 8 (Branch Nil 9 Nil))
+--       6
+--     /   \
+--    2     8
+--  /  \   / \
+-- 0   3  7   9
 
 instance Foldable Tree where
   -- foldr :: (a -> b -> b) -> b -> t a -> b
@@ -19,7 +23,7 @@ instance Foldable Tree where
 instance Foldable PreOrder where
   -- foldr :: (a -> b -> b) -> b -> t a -> b
   foldr f ini (PreO Nil) = ini
-  foldr f ini (PreO (Branch l x r)) = f x (foldr f (foldr f ini r) l)
+  foldr f ini (PreO (Branch l x r)) = f x (foldr f (foldr f ini (PreO r)) (PreO l))
 
 
 instance Foldable PostOrder where
