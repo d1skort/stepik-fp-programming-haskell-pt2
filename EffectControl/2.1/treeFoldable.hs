@@ -29,7 +29,7 @@ instance Foldable PreOrder where
 instance Foldable PostOrder where
   -- foldr :: (a -> b -> b) -> b -> t a -> b
   foldr f ini (PostO Nil) = ini
-  foldr f ini (PostO (Branch l x r)) = undefined
+  foldr f ini (PostO (Branch l x r)) = foldr f (foldr f (f x ini) (PostO r)) (PostO l)
 
 
 instance Foldable LevelOder where
