@@ -35,8 +35,7 @@ instance Foldable Postorder where
 instance Foldable Levelorder where
   -- foldr :: (a -> b -> b) -> b -> t a -> b
   foldr f ini (LevelO Nil) = ini
-  foldr f ini (LevelO tree) = foldl (\res a -> f a res) ini (fun (tree : []) []) where
-    fun [] res = res
-    fun ((Branch l x r) : ys) res = fun (append r (append l ys)) (x : res)
-    append Nil xs = xs
-    append tree xs = xs ++ [tree]
+  foldr f ini (LevelO tree) = fun [tree] where
+    fun [] = ini
+    fun (Nil:xs) = fun xs
+    fun ((Branch l x r):xs) = f x $ fun (xs ++ [l, r])
