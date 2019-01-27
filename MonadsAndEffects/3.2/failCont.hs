@@ -34,6 +34,13 @@ instance Monad (FailCont r e) where
   FailCont v >>= k = FailCont $ \ok err -> v (\a -> runFailCont (k a) ok err) err
 
 
+-- callCFC :: ((a -> (b -> r) -> (e -> r) -> r) -> (a -> r) -> (e -> r) -> r) -> (a -> r) -> (e -> r) -> r
+-- callCFC f = \ok err -> f (\a _ _ -> ok a) ok err
+
+callCFC :: ((a -> FailCont r e b) -> FailCont r e a) -> FailCont r e a
+callCFC f = FailCont $ \ok err -> runFailCont (f (\a -> FailCont $ \_ _ -> ok a)) ok err
+
+
 tryRead :: Read a => String -> Except ReadError a
 tryRead [] = throwE EmptyInput
 tryRead s  = f $ reads s where
