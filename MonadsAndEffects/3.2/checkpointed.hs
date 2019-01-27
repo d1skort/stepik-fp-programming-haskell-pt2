@@ -18,4 +18,4 @@ addTens x1 = \checkpoint -> do
 
 
 runCheckpointed :: (a -> Bool) -> Checkpointed a -> a
-runCheckpointed = undefined
+runCheckpointed pr chkp = runCont (chkp (\x -> cont $ \c -> if (pr (c x)) then c x else x)) id
