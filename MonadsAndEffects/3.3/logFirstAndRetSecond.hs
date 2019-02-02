@@ -1,6 +1,5 @@
 module LogFirstAndRetSecond where
 
-
 import Control.Monad.Trans.Writer
 import Control.Monad.Trans.Reader
 import Control.Monad.Trans (lift)
