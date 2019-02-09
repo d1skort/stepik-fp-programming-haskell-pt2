@@ -13,6 +13,10 @@ runMyRWT :: MyRWT m a -> [String] -> m (a, String)
 runMyRWT rwt = runWriterT . runReaderT rwt
 
 
+myAsk :: Monad m => MyRWT m [String]
+myAsk = ask
+
+
 myAsks :: Monad m => ([String] -> a) -> MyRWT m a
 myAsks = asks
 
@@ -33,3 +37,25 @@ logFirstAndRetSecond = do
   myLift $ putStrLn $ "Second is " ++ show el2
   myTell el1
   return el2
+
+
+logFirstAndRetSecondSafe :: MyRWT Maybe String
+logFirstAndRetSecondSafe = do
+  xs <- myAsk
+  case xs of
+    (el1 : el2 : _) -> myTell el1 >> return (map toUpper el2)
+    _ -> myLift Nothing
+
+
+myWithReader :: (r' -> r)
+                -> ReaderT r (WriterT String m) a
+                -> ReaderT r' (WriterT String m) a
+myWithReader f r = ReaderT $ \e -> runReaderT r (f e)
+
+
+veryComplexComputation :: MyRWT Maybe (String, String)
+veryComplexComputation = do
+  e1 <- myWithReader (filter $ even . length) logFirstAndRetSecondSafe
+  myTell ","
+  e2 <- myWithReader (filter $ odd . length) logFirstAndRetSecondSafe
+  return (e1, e2)
