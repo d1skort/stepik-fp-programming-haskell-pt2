@@ -13,6 +13,10 @@ runMyRWT :: MyRWT m a -> [String] -> m (a, String)
 runMyRWT rwt = runWriterT . runReaderT rwt
 
 
+myAsk :: Monad m => MyRWT m [String]
+myAsk = ask
+
+
 myAsks :: Monad m => ([String] -> a) -> MyRWT m a
 myAsks = asks
 
