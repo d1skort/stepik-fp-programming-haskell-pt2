@@ -2,12 +2,14 @@ module LogT where
 
 import Control.Applicative (liftA2)
 import Control.Monad.Identity
-
+import Control.Monad.Trans.State
+import Control.Monad.Trans.Class
 
 data Logged a = Logged String a deriving (Eq, Show)
 
-
 newtype LoggT m a = LoggT { runLoggT :: m (Logged a) }
+
+type Logg = LoggT Identity
 
 
 instance Functor m => Functor (LoggT m) where
@@ -47,3 +49,27 @@ failTst xs = do
   5 <- LoggT $ fmap (Logged "") xs
   LoggT [Logged "A" ()]
   return 42
+
+
+write2log :: Monad m => String -> LoggT m ()
+write2log s = LoggT $ return $ Logged s ()
+
+
+runLogg :: Logg a -> Logged a
+runLogg = runIdentity . runLoggT
+
+
+logTst' :: Logg Integer
+logTst' = do
+  write2log "AAA"
+  write2log "BBB"
+  return 42
+
+
+stLog :: StateT Integer Logg Integer
+stLog = do
+  modify (+1)
+  a <- get
+  lift $ write2log $ show $ a * 10
+  put 42
+  return $ a * 100
