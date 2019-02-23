@@ -37,6 +37,11 @@ instance Monad m => Monad (LoggT m) where
   fail = LoggT . fail
 
 
+instance MonadTrans LoggT where
+  -- lift :: Monad m => m a -> t m a
+  lift ma = LoggT $ ma >>= (return . Logged "")
+
+
 logTst :: LoggT Identity Integer
 logTst = do
   x <- LoggT $ Identity $ Logged "AAA" 30
@@ -72,4 +77,13 @@ stLog = do
   a <- get
   lift $ write2log $ show $ a * 10
   put 42
+  return $ a * 100
+
+
+logSt :: LoggT (State Integer) Integer
+logSt = do
+  lift $ modify (+1)
+  a <- lift get
+  write2log $ show $ a * 10
+  lift $ put 42
   return $ a * 100
