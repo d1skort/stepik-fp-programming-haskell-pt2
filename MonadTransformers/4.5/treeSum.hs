@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
 module TreeSum where
 
 import Control.Monad.Except
